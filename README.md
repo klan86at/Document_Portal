@@ -33,3 +33,10 @@ git commit -m "<write_commit_msg>"
 git push -u origin main
 ```
 
+## Minimum requirements for this project
+
+1. LLM Model ##groq(open source), openai(paid), claude(paid), huggingface(open), ollama(local), gemini(first 15days free)
+
+2. Embedding model ## openai, hf, gemini
+
+3. Vector database ##inmemory(chroma, faiss) ##ondisk ##cloudbased
