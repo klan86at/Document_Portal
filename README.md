@@ -1,4 +1,4 @@
-## Below command is for windows (cmd)
+## Below commands is for windows (cmd)
 ```
 mkdir <project_folder_name>
 ```
@@ -27,7 +27,7 @@ git init
 git add .
 ```
 ```
-git commit -m <write_commit_msg>
+git commit -m "<write_commit_msg>"
 ```
 ```
 git push -u origin main
