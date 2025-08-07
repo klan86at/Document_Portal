@@ -40,3 +40,19 @@ git push -u origin main
 2. Embedding model ## openai, hf, gemini
 
 3. Vector database ##inmemory(chroma, faiss) ##ondisk ##cloudbased
+
+## Groq API KEY LINK
+```
+https://console.groq.com/keys
+```
+```
+https://console.groq.com/docs/overview
+```
+
+## GEMINI API KEY LINK
+```
+https://aistudio.google.com/apikey
+```
+```
+https://ai.google.dev/gemini-api/docs/models
+```
