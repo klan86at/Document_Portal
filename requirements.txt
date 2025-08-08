@@ -3,4 +3,7 @@ python-dotenv
 langchain_groq
 ipykernel
 langchain_google_genai
+langchain-community
+pypdf
+faiss-cpu
 -e .
