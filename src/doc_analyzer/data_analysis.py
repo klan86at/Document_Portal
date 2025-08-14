@@ -18,7 +18,7 @@ class DocumentAnalyzer:
         # self.fixing_parser = OutputFixingParser.from_llm(llm=self.llm, parser=self.parser)
         # self.log = CustomLogger().get_logger(__name__)
 
-    def analyze_metadata(self):
+    def analyze_document(self):
         """
         Analyze the given document text using the LLM model.
         """
@@ -29,5 +29,4 @@ class DocumentAnalyzer:
         #     analysis_result = model.analyze(document_path)
         # except Exception as e:
         #     raise DocumentPortalException("Error analyzing document", e) from e
-    
     
