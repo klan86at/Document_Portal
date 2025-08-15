@@ -5,8 +5,9 @@ from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any, Union
 
 
+
 class Metadata(BaseModel):
-    Summary: List[str] = Field(default_factory=list, description="A list of summary points extracted from the document.")]
+    Summary: List[str] = Field(default_factory=list, description="A list of summary points extracted from the document.")
     """
     Represents the metadata associated with a document.
     """

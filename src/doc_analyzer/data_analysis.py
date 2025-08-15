@@ -44,7 +44,7 @@ class DocumentAnalyzer:
 
             response = chain.invoke({
                 "format_instructions": self.parser.get_format_instructions(),
-                "text": document_text
+                "document_text": document_text
             })
 
             self.log.info("Metadata analysis completed", keys=list(response.keys()))
