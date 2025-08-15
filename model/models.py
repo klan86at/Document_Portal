@@ -1,7 +1,7 @@
 from ctypes import Union
 from annotated_types import T
 from langchain_text_splitters import Language
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, RootModel
 from typing import Optional, List, Dict, Any, Union
 
 
@@ -19,3 +19,10 @@ class Metadata(BaseModel):
     Language: Optional[str] = Field(None, description="The language of the document.")
     PageCount: Union[int, str] = Field(..., description="The number of pages in the document.")
     SentimentTone: str = Field(..., description="The sentiment tone of the document.")
+
+class ChangeFormat(BaseModel):
+    page: str
+    changes: str
+
+class SummaryResponse(RootModel[list[ChangeFormat]]):
+    pass
