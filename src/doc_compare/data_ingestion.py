@@ -2,44 +2,31 @@ from itertools import count
 from multiprocessing import Value
 import sys
 from pathlib import Path
+import uuid
+from datetime import datetime, timezone
 import fitz  # cSpell:ignore fitz
 from sqlalchemy import all_
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
 
 class DocumentIngestion:
-    def __init__ (self, base_dir: str="data\\doc_compare"):
+    def __init__ (self, base_dir: str="data/doc_compare", session_id=None):
         self.log = CustomLogger().get_logger(__name__)
         self.base_dir = Path(base_dir)
-        self.base_dir.mkdir(parents=True, exist_ok=True)
+        self.session_id = session_id or f"session_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S_%f')}_{uuid.uuid4().hex[:8]}"
+        self.session_path = self.base_dir / self.session_id
+        self.session_path.mkdir(parents=True, exist_ok=True)
     
-    def delete_existing_files(self):
-        """
-        Deletes all files at the specified paths.
-        """
-        try:
-            if self.base_dir.exists():
-                for file in self.base_dir.iterdir():
-                    if file.is_file():
-                        file.unlink()
-                        self.log.info("Existing files deleted successfully", path=str(file))
-                self.log.info("Directory cleaned", directory=str(self.base_dir))
-        except Exception as e:
-            self.log.error(f"Error deleting existing files, {e}")
-            raise DocumentPortalException("Error occurred while deleting existing files", sys)
     
     def save_uploaded_files(self, reference_file, actual_file):
         """
         Saves uploaded files to a specific directory.
         """
         try:
-            self.delete_existing_files()
-            self.log.info("Existing files deleted successfully.")
-
             ref_path= self.base_dir / reference_file.name
             act_path= self.base_dir / actual_file.name
 
-            if not reference_file.name.endswith(".pdf") or not actual_file.name.endswith(".pdf"):
+            if not reference_file.name.lower().endswith(".pdf") or not actual_file.name.lower().endswith(".pdf"):
                 raise ValueError("Only PDF files are allowed.")
             
             with open(act_path, "wb") as f:
@@ -83,17 +70,35 @@ class DocumentIngestion:
             content_dict = {}
             doc_parts = []
 
-            for filename in sorted(self.base_dir.iterdir()):
+            for filename in sorted(self.session_path.iterdir()):
                 if filename.is_file() and filename.name.endswith(".pdf"):
-                    content_dict[filename.name] = self.read_pdf(filename)
-
-            for filename, content in content_dict.items():
-                doc_parts.append(f"\n--- {filename} ---\n{content}")
+                    content = self.read_pdf(filename)
+                    doc_parts.append(f"Document: {filename.name}\n{content}")
 
             combined_text = "\n\n".join(doc_parts)
-            self.log.info("Documents combined successfully", count=len(doc_parts))
+            self.log.info("Documents combined successfully", count=len(doc_parts), session=self.session_id)
             return combined_text
         
         except Exception as e:
             self.log.error(f"Error combining documents, {e}")
             raise DocumentPortalException("Error combining documents", sys)
+        
+
+    def clean_old_sessions(self, keep_latest: int = 3):
+        """
+        Method to delete older session folders, keeping only latest int = n.
+        """
+        try:
+            session_folders = sorted(
+                [f for f in self.base_dir.iterdir() if f.is_dir()],
+                reverse=True
+            )
+            for folder in session_folders[keep_latest:]:
+                for file in folder.iterdir():
+                    file.unlink()
+                folder.rmdir()
+                self.log.info("Old session folder deleted", path=str(folder))
+                
+        except Exception as e:
+            self.log.error(f"Error deleting existing files, {e}")
+            raise DocumentPortalException("Error occurred while deleting existing files", sys)

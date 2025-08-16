@@ -22,12 +22,12 @@ class DocumentPortalException(Exception):
         Traceback: {self.traceback_str}
         """
 
-if __name__ == "__main__":
-    try:
-        # Simulate an error
-        a = 1 / 0
-        print(a)
-    except Exception as e:
-        app_exc=DocumentPortalException(str(e), sys)
-        logger.error(app_exc)
-        raise app_exc
+# if __name__ == "__main__":
+#     try:
+#         # Simulate an error
+#         a = 1 / 0
+#         print(a)
+#     except Exception as e:
+#         app_exc=DocumentPortalException(str(e), sys)
+#         logger.error(app_exc)
+#         raise app_exc

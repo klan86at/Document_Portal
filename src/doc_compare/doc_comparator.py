@@ -22,8 +22,7 @@ class DocumentComparatorLLM:
         self.fixing_parser = OutputFixingParser.from_llm(parser=self.parser, llm=self.llm)
         self.prompt = PROMPT_REGISTRY["document_comparison"]
         self.chain = self.prompt | self.llm | self.parser 
-
-        self.log.info("DocumentComparatorLLM initialized with model and parser.")
+        self.log.info("DocumentComparatorLLM initialized", model=self.llm)
 
     def compare_documents(self, combined_docs: str) -> pd.DataFrame:
         """
@@ -49,7 +48,6 @@ class DocumentComparatorLLM:
         """
         try:
             df = pd.DataFrame(response_parsed)
-            self.log.info("Response formatted into Dataframe", dataframe=df)
             return df
         except Exception as e:
             self.log.error(f"Error formatting response into Dataframe, {e}")

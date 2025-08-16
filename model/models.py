@@ -3,7 +3,7 @@ from annotated_types import T
 from langchain_text_splitters import Language
 from pydantic import BaseModel, Field, RootModel
 from typing import Optional, List, Dict, Any, Union
-
+from zmq import Enum
 
 
 class Metadata(BaseModel):
@@ -21,8 +21,14 @@ class Metadata(BaseModel):
     SentimentTone: str = Field(..., description="The sentiment tone of the document.")
 
 class ChangeFormat(BaseModel):
-    page: str
-    changes: str
+    Page: str
+    Changes: str
 
 class SummaryResponse(RootModel[list[ChangeFormat]]):
     pass
+
+class PromptType(str, Enum):
+    DOCUMENT_ANALYSIS = "doc_analysis"
+    DOCUMENT_COMPARISON = "doc_comparison"
+    CONTEXTUALIZE_QUESTION = "contextualize_question"
+    CONTEXT_QA = "context_qa"
