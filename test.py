@@ -43,60 +43,99 @@
 # if __name__ == "__main__":
 #     main()
 
-import io 
-from pathlib import Path
-from src.doc_compare.data_ingestion import DocumentIngestion
-from src.doc_compare.doc_comparator import DocumentComparatorLLM
 
-def load_fake_uploaded_file(file_path: Path):
-    return io.BytesIO(file_path.read_bytes())
+## Testing code for comparison module
+# import io 
+# from pathlib import Path
+# from src.doc_compare.data_ingestion import DocumentIngestion
+# from src.doc_compare.doc_comparator import DocumentComparatorLLM
 
-# ------ Step 1: Save and combine PDFs ------
-def test_compare_documents():
-    # cSpell:ignore LLMOPs
-    ref_path = Path(r"D:\LLMOPs\Document_Portal\data\doc_compare\Long_Report_V1.pdf")
-    act_path = Path(r"D:\LLMOPs\Document_Portal\data\doc_compare\Long_Report_V2.pdf")
+# def load_fake_uploaded_file(file_path: Path):
+#     return io.BytesIO(file_path.read_bytes())
 
-# Wrap them like streamlit UploadedFile- style
-    class FakeUpload:
-        def __init__(self, file_path: Path):
-            self.name = file_path.name
-            self._buffer = file_path.read_bytes()
+# # ------ Step 1: Save and combine PDFs ------
+# def test_compare_documents():
+#     # cSpell:ignore LLMOPs
+#     ref_path = Path(r"D:\LLMOPs\Document_Portal\data\doc_compare\Long_Report_V1.pdf")
+#     act_path = Path(r"D:\LLMOPs\Document_Portal\data\doc_compare\Long_Report_V2.pdf")
 
-        def getbuffer(self):  # cSpell:ignore getbuffer
-            return self._buffer
+# # Wrap them like streamlit UploadedFile- style
+#     class FakeUpload:
+#         def __init__(self, file_path: Path):
+#             self.name = file_path.name
+#             self._buffer = file_path.read_bytes()
+
+#         def getbuffer(self):  # cSpell:ignore getbuffer
+#             return self._buffer
         
-    # Initiate
-    comparator = DocumentIngestion()
-    ref_upload = FakeUpload(ref_path)
-    act_upload = FakeUpload(act_path)
+#     # Initiate
+#     comparator = DocumentIngestion()
+#     ref_upload = FakeUpload(ref_path)
+#     act_upload = FakeUpload(act_path)
 
-    ref_file, act_file = comparator.save_uploaded_files(ref_upload, act_upload)
-    combined_text = comparator.combine_documents()
-    comparator.clean_old_sessions(keep_latest=3)
+#     ref_file, act_file = comparator.save_uploaded_files(ref_upload, act_upload)
+#     combined_text = comparator.combine_documents()
+#     comparator.clean_old_sessions(keep_latest=3)
 
-    print("\n Combine Text Preview (First 1000 chars): \n")
-    print(combined_text[:1000])
+#     print("\n Combine Text Preview (First 1000 chars): \n")
+#     print(combined_text[:1000])
 
-    llm_comparator = DocumentComparatorLLM()
-    comparison_df = llm_comparator.compare_documents(combined_text)
+#     llm_comparator = DocumentComparatorLLM()
+#     comparison_df = llm_comparator.compare_documents(combined_text)
 
-    print("\n=== COMPARISON RESULT ===")
-    print(comparison_df.head(10))
+#     print("\n=== COMPARISON RESULT ===")
+#     print(comparison_df.head(10))
+
+# if __name__ == "__main__":
+#     test_compare_documents()
+
+
+
+import sys
+from pathlib import Path
+from langchain_community.vectorstores import FAISS  # cSpell:ignore vectorstores FAISS
+from requests import session
+from src.single_doc_chat.data_ingestion import SingleDocIngestor  # cSpell:ignore Ingestor
+from src.single_doc_chat.retreival import ConversationalRAG  # cSpell:ignore retreival
+from utils import model_loader
+from utils.model_loader import ModelLoader
+
+FAISS_INDEX_PATH = Path("faiss_index")
+
+def test_conversational_rag_on_pdf(pdf_path:str, question:str):
+    try:
+        model_loader = ModelLoader()
+
+        if FAISS_INDEX_PATH.exists():
+            print("Loading existing FAISS index...")
+            embeddings = model_loader.load_embeddings()
+            vectorstore = FAISS.load_local(folder_path=str(FAISS_INDEX_PATH), embeddings=embeddings, allow_dangerous_deserialization=True)  # cSpell:ignore vectorstore
+            retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
+        else:
+            # Step 2: Ingest the document and create retriever
+            print("FAISS index not found. Ingesting PDF and creating index...")
+            with open(pdf_path, "rb") as f:
+                uploaded_files = [f]
+                ingestor = SingleDocIngestor()
+                retriever = ingestor.ingest_files(uploaded_files)
+            print("Running Conversational RAG...")
+            session_id = "test_conversational_rag"
+            rag = ConversationalRAG(retriever=retriever, session_id=session_id)
+
+            response = rag.invoke(question)
+            print(f"\nQuestion: {question}\nAnswer: {response}\n")
+    except Exception as e:
+        print(f"Test failed: {str(e)}")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    test_compare_documents()
+    # Example PDF path and question
+    pdf_path = r"data\\single_doc_chat\\NIPS-2017-attention-is-all-you-need-Paper.pdf"
+    question = "What is the title of the paper?"
 
-    # comparator = DocumentComparator(session_id="test_compare_documents")
-    # ref_path, act_path = comparator.save_uploaded_files(ref_file, act_file)
-    # print(f"PDF saved at: {ref_path}, {act_path}")
+    if not Path(pdf_path).exists():
+        print(f"PDF file not found at {pdf_path}")
+        sys.exit(1)
 
-    # # ------ STEP 2: Data Comparison ------
-    # print("Starting document comparison...")
-    # comparator_llm = DocumentComparatorLLM()
-    # comparison_result = comparator_llm.compare_documents(comparator.read_pdf(ref_path))
-    # print(f"Comparison result: {comparison_result}")
-    # # Path to the PDF you want to test
-    # PDF_PATH = r"D:\\LLMOPs\\Document_Portal\\data\\doc_compare\\reference\\AppliedAI_White_Paper_Retrieval-augmented-Generation-Realized_FINAL_20240618.pdf"
-    # ACTUAL_PATH = r"D:\\LLMOPs\\Document_Portal\\data\\doc_compare\\actual\\AppliedAI_White_Paper_Retrieval-augmented-Generation-Realized_FINAL_20240618.pdf"
-    # return PDF_PATH, ACTUAL_PATH
+    # Run the test
+    test_conversational_rag_on_pdf(str(pdf_path), question)

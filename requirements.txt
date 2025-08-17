@@ -1,4 +1,4 @@
-# cSpell:ignore langchain groq genai faiss structlog PyMuPDF dotenv ipykernel pypdf
+# cSpell:ignore langchain groq genai faiss structlog PyMuPDF dotenv ipykernel pypdf streamlit pytest
 langchain
 python-dotenv
 langchain_groq
@@ -10,4 +10,7 @@ faiss-cpu
 structlog
 PyMuPDF
 pandas
+streamlit
+langchain-core[tracing]
+pytest
 -e .
