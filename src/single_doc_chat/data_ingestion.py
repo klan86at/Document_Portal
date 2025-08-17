@@ -48,13 +48,13 @@ class SingleDocIngestor:  # cSpell:ignore Ingestor
     def _create_retriever(self, documents):
         try:
             # perform chunking
-            splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+            splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=300)
             chunks = splitter.split_documents(documents)
             self.log.info("Documents chunked", count=len(chunks))
 
             # Load embeddings
             embeddings = self.model_loader.load_embeddings()
-            vectorstore = FAISS.from_documents(chunks, embeddings)  # cSpell:ignore vectorstore
+            vectorstore = FAISS.from_documents(documents=chunks, embedding=embeddings)  # cSpell:ignore vectorstore
 
             # Save FAISS index
             vectorstore.save_local(str(self.faiss_dir))

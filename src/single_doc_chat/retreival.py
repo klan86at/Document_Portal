@@ -19,17 +19,19 @@ from model.models import PromptType
 
 class ConversationalRAG:
     def __init__(self, session_id: str, retriever):
+        self.log = CustomLogger().get_logger(__name__)
+        self.session_id = session_id
+        self.retriever = retriever
         try:
-            self.log = CustomLogger().get_logger(__name__)
-            self.session_id = session_id
-            self.retriever = retriever
             self.llm = self._load_llm()
             self.contextualize_prompt = PROMPT_REGISTRY[PromptType.CONTEXTUALIZE_QUESTION.value]
             self.qa_prompt = PROMPT_REGISTRY[PromptType.CONTEXT_QA.value]
+
             self.history_aware_retriever = create_history_aware_retriever(
                 self.llm, self.retriever, self.contextualize_prompt
             )
             self.log.info("Created history aware retriever", session_id=session_id)
+
             self.qa_chain = create_stuff_documents_chain(self.llm, self.qa_prompt)
             self.rag_chain = create_retrieval_chain(self.history_aware_retriever, self.qa_chain)
             self.log.info("Created RAG chain", session_id=session_id)
@@ -39,9 +41,9 @@ class ConversationalRAG:
                 self._get_session_history,
                 input_messages_key="input",
                 history_messages_key="chat_history",
-                output_messages_key="answer",
+                output_messages_key="answer"
             )
-            self.log.info("Created RunnableWithMessageHistory", session_id=session_id)
+            self.log.info("Wrapped chain with message history", session_id=session_id)
             
         except Exception as e:
             self.log.error("Error in initializing ConversationalRAG", error=str(e))
