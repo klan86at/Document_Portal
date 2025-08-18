@@ -1,6 +1,6 @@
 from fileinput import filename
 import os
-import fitz
+import fitz  # cSpell:ignore fitz
 import uuid
 from datetime import datetime
 
@@ -42,7 +42,7 @@ class DocumentHandler:
             save_path = os.path.join(self.session_path, filename)
 
             with open(save_path, 'wb') as f:
-                f.write(uploaded_file.getbuffer())
+                f.write(uploaded_file.getbuffer())  # cSpell:ignore getbuffer
 
             self.log.info("PDF saved successfully", file=filename, save_path=save_path, session_id=self.session_id)
             return save_path
@@ -56,7 +56,7 @@ class DocumentHandler:
             with fitz.open(pdf_path) as doc:
                 for page_num in range(len(doc)):
                     page = doc[page_num]
-                    text_chunks.append(f"\n--- Page {page_num + 1} ---\n{page.get_text()}")
+                    text_chunks.append(f"\n--- Page {page_num + 1} ---\n{page.get_text()}")  # type: ignore
             text = "\n".join(text_chunks)
 
             self.log.info("PDF read successfully", pdf_path=pdf_path, session_id=self.session_id, pages=len(text_chunks))
@@ -70,6 +70,7 @@ if __name__ == "__main__":
     from io import BytesIO
     handler = DocumentHandler()
 
+    # cSpell:ignore LLMOPs
     pdf_path =r"D:\\LLMOPs\\Document_Portal\\data\\doc_analysis\\AppliedAI_White_Paper_Retrieval-augmented-Generation-Realized_FINAL_20240618.pdf"
 
     class DummyFile:
