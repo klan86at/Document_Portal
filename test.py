@@ -168,7 +168,6 @@ def test_document_ingestion_and_rag():
             print("No valid files to upload")
             sys.exit(1)
 
-        
         ingestor = DocumentIngestor()
         retriever = ingestor.ingest_file(uploaded_files)
 
@@ -189,3 +188,6 @@ def test_document_ingestion_and_rag():
     except Exception as e:
         print(f"Test failed: {str(e)}")
         sys.exit(1)
+
+if __name__ == "__main__":
+    test_document_ingestion_and_rag()
