@@ -10,7 +10,6 @@ from fastapi.templating import Jinja2Templates
 from src.doc_ingestion.data_ingestion import (
     ChatIngestor,
     DocHandler,
-    DocumentIngestor,
     DocumentComparator,
     FaissManager,
 )
