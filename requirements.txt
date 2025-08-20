@@ -1,17 +1,22 @@
 # cSpell:ignore langchain groq genai faiss structlog PyMuPDF dotenv ipykernel pypdf streamlit pytest
-langchain
-python-dotenv
-langchain_groq
-ipykernel
-langchain_google_genai
-langchain-community
-pypdf
-faiss-cpu
-structlog
-PyMuPDF
-pandas
-streamlit
-langchain-core[tracing]
-pytest
-docx2txt
+# cSpell:ignore fastapi uvicorn python-multipart docx2txt
+# cSpell:ignore pypdf pylint
+langchain==0.3.27
+python-dotenv==1.1.1
+ipykernel==6.30.1
+langchain_groq==0.3.7
+langchain_google_genai==2.1.9
+langchain-community==0.3.27
+faiss-cpu==1.11.0.post1
+structlog==25.4.0
+PyMuPDF==1.26.3
+pylint==3.3.8
+langchain-core==0.3.74
+pytest==8.4.1
+streamlit==1.48.1
+fastapi==0.116.1
+uvicorn==0.35.0
+python-multipart==0.0.20
+docx2txt==0.9
+pypdf==5.9.0
 -e .
