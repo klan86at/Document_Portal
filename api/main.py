@@ -1,6 +1,7 @@
 # Libraries
-from pydoc import Doc
-from typing import Any, Dict, List, Optional, Union
+import os
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, UploadFile, File, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,17 +9,25 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from src.doc_ingestion.data_ingestion import (
-    ChatIngestor,
+    ChatIngestor,  # cSpell:ignore Ingestor
     DocHandler,
-    DocumentComparator,
-    FaissManager,
+    DocumentComparator
 )
 from src.doc_analyzer.data_analysis import DocumentAnalyzer
 from src.doc_compare.doc_comparator import DocumentComparatorLLM
 from src.doc_chat.retrieval import ConversationalRAG
+from utils.doc_ops import FastAPIFileAdapter, read_pdf_via_handler
+# from logger import GLOBAL_LOGGER as log
 
+FAISS_BASE = os.getenv("FAISS_BASE", "faiss_index")  # cSpell:ignore FAISS
+UPLOAD_BASE = os.getenv("UPLOAD_BASE", "data")
+FAISS_INDEX_NAME = os.getenv("FAISS_INDEX_NAME", "index")  # <--- keep consistent with save_local()
 
 app = FastAPI(title="DevPortal API", version="1.0.0")  # object of fastapi class
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 app.add_middleware(
     CORSMiddleware,
@@ -28,44 +37,23 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-app.mount("/static", StaticFiles(directory="../static"), name="static")
-templates = Jinja2Templates(directory="../templates")
-
 @app.get("/", response_class=HTMLResponse)
 async def serve_ui(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    resp = templates.TemplateResponse("index.html", {"request": request})
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
 
 @app.get("/health")
 async def health_check() -> Dict[str, str]:
     return {"status": "ok", "service": "Document_Portal"}
 
-class FastAPIFileAdapter:
-    """
-    Adapter to convert FastAPI UploadFile to a format compatible with DocHandler.
-    """
-    def __init__(self, uf: UploadFile):
-        self._uf = uf
-        self.name = uf.filename
-    def getbuffer(self) -> bytes:
-        """
-        Returns the content of the file as bytes.
-        """
-        self._uf.file.seek(0)  # Ensure the file pointer is at the start
-        return self._uf.file.read()
-def _read_pdf_via_handler(handler: DocHandler, Path: str) -> str:
-    """
-    Helper function to read PDF content using DocHandler.
-    """
-    try:
-        pass
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error reading PDF: {str(e)}")
+
 @app.post("/analyze")
 async def analyze_document(file: UploadFile = File(...)) -> Any:
     try:
         dh = DocHandler()
         save_path = dh.save_pdf(FastAPIFileAdapter(file))
-        text = _read_pdf_via_handler(dh, save_path)
+        text = read_pdf_via_handler(dh, save_path)
 
         analyzer = DocumentAnalyzer()
         result = analyzer.analyze_document(text)
@@ -73,12 +61,13 @@ async def analyze_document(file: UploadFile = File(...)) -> Any:
     except HTTPException:
         raise
     except Exception as e:
+        # log.exception("Error during document analysis")
         raise HTTPException(status_code=500, detail=f"Analysis failed: {e}")
     
 @app.post("/compare")
 async def compare_documents(reference: UploadFile = File(...), actual: UploadFile = File(...)) -> Any:
     try:
-        dc = DocumentComparatorLLM()
+        dc = DocumentComparator()
         ref_path, act_path = dc.save_uploaded_files(FastAPIFileAdapter(reference), FastAPIFileAdapter(actual))
         _ = ref_path, act_path  # Placeholder for actual comparison logic
         combined_text = dc.combine_documents()
@@ -126,12 +115,12 @@ async def chat_query(
             raise HTTPException(status_code=400, detail="Session ID is required when using session directories.")
         
         # Prepare FAISS index path
-        index_dir = os.path.join(FAISS_BASE, session_id) if use_session_dirs else FAISS_BASE
+        index_dir = os.path.join(FAISS_BASE, session_id) if use_session_dirs else FAISS_BASE #type: ignore
         if not os.path.isdir(index_dir):
             raise HTTPException(status_code=400, detail=f"FAISS index not found at: {index_dir}")
         
         # Initialize LCEL-style RAg pipeline
-        rag = ConversationalRAG(session_id=session_id)
+        rag = ConversationalRAG(session_id=session_id) # type: ignore
         rag.load_retriever_from_faiss(index_dir)
 
         # Optional: for now we pass empty chat history

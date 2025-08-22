@@ -9,7 +9,7 @@ from typing import Iterable, List, Optional, Union, Dict, Any
 from utils.model_loader import ModelLoader
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
-from logger import GLOBAL_LOGGER as log
+# from logger import GLOBAL_LOGGER as log
 
 
 log = CustomLogger().get_logger(__name__)
@@ -20,7 +20,7 @@ SUPPORTED_EXTENSIONS = {'.pdf', '.txt', '.docx'}
 # Helpers (file I/O + loading)  #
 # ----------------------------- #
 def generate_session_id(prefix: str = "session") -> str:
-    utc = ZoneInfo("Africa/Kolkata")
+    utc = ZoneInfo("Africa")
     return f"{prefix}_{datetime.now(utc).strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"
 
 def save_uploaded_files(uploaded_files: Iterable, target_dir: Path) -> List[Path]:

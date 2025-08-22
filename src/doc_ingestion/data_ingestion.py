@@ -6,6 +6,7 @@ import sys
 import json
 import uuid
 import shutil
+import hashlib
 from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Union, Dict, Any, Iterable
@@ -15,7 +16,7 @@ from langchain.schema import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS  # cSpell:ignore vectorstores
 from langchain_community.document_loaders import PyMuPDFLoader, TextLoader, Docx2txtLoader
-from networkx import truncated_tetrahedron_graph
+# from networkx import truncated_tetrahedron_graph
 from tomlkit import document, key
 
 from utils.file_io import save_uploaded_files
@@ -23,8 +24,8 @@ from utils.model_loader import ModelLoader
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
 
-# from utils.file_io import _session_id, save_uploaded_files
-# from utils.document_ops import load_documents, combine_documents, concat_for_analysis, concat_for_comparison
+from utils.file_io import generate_session_id, save_uploaded_files
+from utils.doc_ops import load_documents, concat_for_analysis, concat_for_comparison
 
 
 # Load or create  FAISS Manager
@@ -80,7 +81,7 @@ class FaissManager:  # cSpell:ignore Faiss
             self._save_meta()
         return len(new_docs)
     
-    def load_or_create(self, texts: Optional[List[str]]=None, metadatas: Optional[List[dict]]=None):
+    def load_or_create(self, texts: Optional[List[str]]=None, metadatas: Optional[List[dict]]=None):  # cSpell:ignore metadatas
         if self._exists():
             self.vs = FAISS.load_local(
                 str(self.index_dir),
@@ -107,10 +108,12 @@ class ChatIngestor:  # cSpell:ignore Ingestor
             self.model_loader = ModelLoader()
 
             self.use_session = use_session_dirs
-            self.session_id = session_id or _session_id()
+            self.session_id = session_id or generate_session_id()
 
-            self.temp_base = Path(temp_base).mkdir(parents=True, exist_ok=True)
-            self.faiss_base = Path(faiss_base).mkdir(parents=True, exist_ok=True)
+            self.temp_base = Path(temp_base)
+            self.temp_base.mkdir(parents=True, exist_ok=True)
+            self.faiss_base = Path(faiss_base)
+            self.faiss_base.mkdir(parents=True, exist_ok=True)
 
             self.temp_dir = self._resolve_dir(self.temp_base)
             self.faiss_dir = self._resolve_dir(self.faiss_base)
@@ -153,7 +156,7 @@ class ChatIngestor:  # cSpell:ignore Ingestor
             fm = FaissManager(self.faiss_dir, self.model_loader)
 
             texts = [c.page_content for c in chunks]
-            metas = [c.metadata for c in chunks]
+            metas = [c.metadata for c in chunks]  # cSpell:ignore metas
 
             try:
                 vs = fm.load_or_create(texts=texts, metadatas=metas)
@@ -175,7 +178,7 @@ class DocHandler:
     def __init__(self, data_dir: Optional[str] = None, session_id: Optional[str] = None):
         self.log = CustomLogger().get_logger(__name__)
         self.data_dir = data_dir or os.getenv("DATA_STORAGE_PATH", os.path.join(os.getcwd(), "data", "document_analysis"))
-        self.session_id = session_id or _session_id("session")
+        self.session_id = session_id or generate_session_id("session")
         self.session_path = os.path.join(self.data_dir, self.session_id)
         os.makedirs(self.session_path, exist_ok=True)
         self.log.info("DocHandler initialized", session_id=self.session_id, session_path=self.session_path)
@@ -220,7 +223,7 @@ class DocumentComparator:
     def __init__(self, base_dir: str = "data/doc_compare", session_id: Optional[str] = None):
         self.log = CustomLogger().get_logger(__name__)
         self.base_dir = Path(base_dir)
-        self.session_id = session_id or _session_id()
+        self.session_id = session_id or generate_session_id()
         self.session_path = self.base_dir / self.session_id
         self.session_path.mkdir(parents=True, exist_ok=True)
         self.log.info("DocumentComparator initialized", session_id=self.session_id, session_path=str(self.session_path))
@@ -266,7 +269,7 @@ class DocumentComparator:
                     content = self.read_pdf(file)
                     doc_parts.append(f"Documet: {file.name}\n{content}")
             combine_text = "\n\n".join(doc_parts)
-            self.lof.info("Documents combined successfully", count=len(doc_parts), session_id=self.session_id)
+            self.log.info("Documents combined successfully", count=len(doc_parts), session_id=self.session_id)
             return combine_text
         except Exception as e:
             self.log.error("Failed to combine documents", error=str(e), session_id=self.session_id)
