@@ -2,7 +2,7 @@ import sys
 import pandas as pd
 from dotenv import load_dotenv # cSpell:ignore dotenv
 from logger.custom_logger import CustomLogger
-from exception.custom_exception import DocumentPortalException
+from exception.custom_exception_archive import DocumentPortalException
 from model.models import *
 from promptlib.prompt_library import PROMPT_REGISTRY  # cSpell:ignore promptlib
 from utils.model_loader import ModelLoader

@@ -5,7 +5,7 @@ from fastapi import UploadFile
 from langchain.schema import Document
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader
 # from logger import GLOBAL_LOGGER as log
-from exception.custom_exception import DocumentPortalException
+from exception.custom_exception_archive import DocumentPortalException
 from logger.custom_logger import CustomLogger
 
 log=CustomLogger().get_logger(__name__)

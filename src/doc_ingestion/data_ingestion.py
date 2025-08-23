@@ -22,7 +22,7 @@ from tomlkit import document, key
 from utils.file_io import save_uploaded_files
 from utils.model_loader import ModelLoader
 from logger.custom_logger import CustomLogger
-from exception.custom_exception import DocumentPortalException
+from exception.custom_exception_archive import DocumentPortalException
 
 from utils.file_io import generate_session_id, save_uploaded_files
 from utils.doc_ops import load_documents, concat_for_analysis, concat_for_comparison

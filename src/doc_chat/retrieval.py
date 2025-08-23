@@ -11,7 +11,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.vectorstores import FAISS  # cSpell:ignore vectorstores
 
 from utils.model_loader import ModelLoader
-from exception.custom_exception import DocumentPortalException
+from exception.custom_exception_archive import DocumentPortalException
 from logger.custom_logger import CustomLogger
 from promptlib.prompt_library import PROMPT_REGISTRY  # cSpell:ignore promptlib
 from model.models import PromptType
