@@ -4,8 +4,6 @@ import logging
 from datetime import datetime
 import structlog
 
-import logger
-
 
 class CustomLogger:
     def __init__(self, log_dir="logs"):
