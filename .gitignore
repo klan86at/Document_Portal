@@ -8,3 +8,4 @@ logs/
 *.pyc
 archive/
 data/
+.vscode
