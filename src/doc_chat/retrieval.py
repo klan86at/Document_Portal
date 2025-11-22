@@ -1,5 +1,5 @@
 # Import Libraries
-from ast import List
+from typing import List, Optional, Dict, Any
 import os
 import sys
 from operator import itemgetter
@@ -34,7 +34,14 @@ class ConversationalRAG:
             raise DocumentPortalException("Initialization error in ConversationalRAG", sys)
         
 
-    def load_retriever_from_faiss(self, index_path: str):  # cSpell:ignore faiss
+    def load_retriever_from_faiss(
+        self,
+        index_path: str,
+        k: int = 5,
+        index_name: str = "index",
+        search_type: str = "similarity",
+        search_kwargs: Optional[Dict[str, Any]] = None,
+    ):  # cSpell:ignore faiss
         """
         Load a FAISS vectorstore from disk and convert to retriever
         """
