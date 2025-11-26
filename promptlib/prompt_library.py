@@ -71,8 +71,8 @@ context_qa_prompt = ChatPromptTemplate.from_messages([
 
 # Central dictionary to register prompt
 PROMPT_REGISTRY = {
-    "doc_analysis": doc_analysis_prompt,
-    "doc_comparison": doc_comparison_prompt,
+    "document_analysis": doc_analysis_prompt,
+    "document_comparison": doc_comparison_prompt,
     "contextualize_question": contextualize_question_prompt,
     "context_qa": context_qa_prompt
 }

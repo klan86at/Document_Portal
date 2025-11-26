@@ -48,6 +48,14 @@ def health_check() -> Dict[str, str]:
     log.info("Health check passed.")
     return {"status": "ok", "service": "Document_Portal"}
 
+@app.get("/debug/config")
+def debug_config():
+    return {
+        "groq_key_set": bool(os.getenv("GROQ_API_KEY")),
+        "google_key_set": bool(os.getenv("GOOGLE_API_KEY")),
+        "model": os.getenv("GROQ_MODEL", "not set")
+    }
+
 # ---------- ANALYZE ----------
 @app.post("/analyze")
 async def analyze_document(file: UploadFile = File(...)) -> Any:

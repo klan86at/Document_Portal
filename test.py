@@ -1,3 +1,66 @@
+# test_analyzer.py
+import os
+import sys
+from dotenv import load_dotenv
+
+# Add your project root to Python path (adjust if needed)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# Load environment variables (critical for API keys)
+load_dotenv()
+
+# Import your classes (adjust module paths as needed)
+from src.doc_analyzer.data_analysis import DocumentAnalyzer  # <-- UPDATE THIS
+from exception.custom_exception import DocumentPortalException   # <-- UPDATE THIS
+
+# Test document (mock real content)
+TEST_DOCUMENT = """
+Financial Report Q3 2025
+Company: TechGlobal Ltd.
+Date: 2025-10-15
+Prepared by: Jane Doe, CFO
+Department: Finance
+Confidentiality: Internal Use Only
+
+Total Revenue: $4.2M
+Net Profit: $1.1M
+Key Risks: Supply chain delays, currency fluctuations.
+"""
+
+def test_document_analyzer():
+    print("🧪 Starting DocumentAnalyzer test...")
+    
+    try:
+        # Initialize analyzer
+        analyzer = DocumentAnalyzer()
+        print("✅ DocumentAnalyzer initialized")
+        
+        # Run analysis
+        result = analyzer.analyze_document(TEST_DOCUMENT)
+        print("✅ Analysis successful!")
+        print("📄 Extracted metadata:")
+        for key, value in result.items():
+            print(f"  {key}: {value}")
+            
+        return True
+        
+    except DocumentPortalException as e:
+        print(f"❌ DocumentPortalException: {e}")
+        print("🔍 Check: API keys, model name, network access")
+        return False
+        
+    except Exception as e:
+        print(f"💥 Unexpected error: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
+if __name__ == "__main__":
+    success = test_document_analyzer()
+    sys.exit(0 if success else 1)
+
+
 # # Test code for document ingestion and analysis using a PDFHandler and DocumentAnalyzer
 
 # # import os
