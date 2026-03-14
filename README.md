@@ -35,7 +35,7 @@ To get started with Document_Portal:
     conda activate document_portal
     pip install -r requirements.txt
     ```
-    ## Below commands is for windows (cmd)
+    ## Below commands are for windows (cmd)
     ```
     mkdir <project_folder_name>
     ```
