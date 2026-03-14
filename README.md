@@ -4,20 +4,21 @@
 
 ## Overview
 
-Document_Portal is a comprehensive Python project engineered to streamline the development of AI-powered applications leveraging a diverse array of Large Language Models (LLMs). This framework provides seamless integration with popular LLM providers such as Groq, OpenAI, Claude, Hugging Face, Ollama, and Gemini, offering unparalleled flexibility for your NLP initiatives. At its core, Document_Portal supports a variety of embedding models and robust vector databases like Chroma and FAISS, enabling sophisticated semantic search, contextual data retrieval, and efficient information management across your document corpus. With built-in modules for document ingestion, analysis, comparison, and retrieval, it serves as a powerful toolkit for building intelligent systems.
+Document_Portal is a sophisticated Python framework designed to build AI-powered applications that seamlessly integrate multiple Large Language Models (LLMs) such as OpenAI, Groq, and Claude. It leverages advanced embedding models and vector databases like Chroma and FAISS to facilitate sophisticated semantic search and contextual data retrieval. This comprehensive solution offers robust modules for streamlined document ingestion, in-depth analysis, intelligent comparison, and dynamic AI-powered chat functionalities, simplifying complex information management across various data types.
 
-This project was designed as an enterprise-grade solution to automate and streamline high-stakes financial workflows, specifically assisting in the cross-referencing and verification of Invoices, Receipts, and Local Purchase Orders (LPOs). It exists to eliminate the manual overhead of document auditing by leveraging advanced Natural Language Processing to detect discrepancies and validate transaction data across disparate formats.
+The primary motivation behind Document_Portal is to revolutionize and automate high-stakes financial workflows, specifically focusing on the critical tasks of cross-referencing and verifying crucial financial documents like invoices, receipts, and purchase orders. By providing an enterprise-grade solution, the project aims to eliminate the substantial overhead associated with manual auditing processes, drastically improve the detection of discrepancies, and ensure rigorous corporate compliance, thereby mitigating financial risks and operational inefficiencies.
 
-By abstracting the complexities of multi-source LLM integration and vector-based semantic search, the Document_Portal provides a unified foundation for building intelligent Q&A and verification systems. Whether performing three-way matching between procurement documents or generating instant summaries of financial records, the system offers the modularity and precision required for real-world corporate compliance. Its structured architecture—featuring robust API endpoints, an intuitive Streamlit dashboard for finance teams, and Dockerization for secure, on-premise or cloud deployment—ensures that cutting-edge AI is both accessible to the business and scalable across the organization.
+Tailored for financial institutions and enterprises requiring stringent document verification, Document_Portal empowers organizations to achieve greater accuracy and efficiency in their operations. Its modular architecture, evident through dedicated components for data ingestion, analysis, and comparison, combined with a user-friendly Streamlit dashboard and full Docker support, ensures scalability, easy deployment, and maintainability. The framework is built with robustness in mind, featuring custom logging, exception handling, a dedicated API, and prompt management capabilities, making it a reliable solution for critical business applications.
 
 ## ✨ Features
 
-*   ✨ **Multi-LLM Integration:** Seamlessly connect with Groq, OpenAI, Claude, Hugging Face, Ollama, and Gemini for diverse AI capabilities.
-*   📚 **Advanced Data Retrieval:** Leverage various embedding models and vector databases like Chroma and FAISS for efficient semantic search and contextual information.
-*   🔄 **Robust Document Workflow:** Streamline document ingestion, analysis, and comparison with dedicated modules and pipelines.
-*   💬 **AI-Powered Chat & Retrieval:** Build sophisticated conversational agents with advanced retrieval-augmented generation (RAG) features.
-*   🌐 **Interactive Web Interface:** Engage with your AI applications through a user-friendly web interface powered by Streamlit and integrated APIs.
-*   ⚙️ **Modular & Production-Ready:** Benefit from a well-structured, containerized (Docker), and cloud-deployable architecture with robust logging and error handling.
+*   ✨ Integrates diverse LLMs (OpenAI, Groq, Claude) and various embedding models for flexible AI applications.
+*   🔍 Leverages FAISS and ChromaDB for advanced semantic search and contextual data retrieval.
+*   📄 Provides robust modules for document ingestion, AI-powered analysis, comparison, and interactive chat.
+*   💰 Automates high-stakes financial document verification to detect discrepancies and ensure corporate compliance.
+*   🚀 Designed with a modular architecture, robust error handling, and Docker support for enterprise-grade scalability.
+*   🖥️ Features an intuitive Streamlit dashboard for seamless user interaction and complex information management.
+*   ☁️ Supports cloud-native deployments with Docker and AWS CloudFormation templates.
 
 ## 📦 Installation
 
@@ -30,71 +31,29 @@ cd Document_Portal
 
 To get started with Document_Portal:
 
-1.  **Environment Setup**
-    Create and activate a Conda environment, then install dependencies:
+1.  **Clone the repository:**
     ```bash
-    conda create -n document_portal python=3.10 -y
-    conda activate document_portal
+    git clone https://github.com/your-org/Document_Portal.git
+    cd Document_Portal
+    ```
+2.  **Install dependencies:**
+    ```bash
     pip install -r requirements.txt
     ```
-    ## Below commands are for windows (cmd)
-    ```
-    mkdir <project_folder_name>
-    ```
-    ```
-    cd <project_folder_name>
-    ```
-    ```
-    code.
-    ```
-    ## For conda env setup
-    ```
-    conda create -p <env_name> python=3.10 -y
-    ```
-    ```
-    conda activate <path_of_the_env>
-    ```
-    ```
-    pip install -r requirements.txt
-    ```
-    ## Git commands
-
-    ```
-    git init
-    ```
-    ```
-    git add .
-    ```
-    ```
-    git commit -m "<write_commit_msg>"
-    ```
-    ```
-    git push -u origin main
-    ```
-
-    ## Minimum requirements for this project
-
-    1. LLM Model ##groq(open source), openai(paid), claude(paid), huggingface(open), ollama(local), gemini
-
-    2. Embedding model ## openai, hf, gemini
-
-    3. Vector database ## Inmemory(chroma, faiss) ## Ondisk ## Cloudbased
-
-2.  **Configuration**
-    Edit `config/config.yaml` to add your API keys for chosen LLM providers (e.g., `OPENAI_API_KEY`, `GROQ_API_KEY`).
-    *   Get Groq API key: [https://console.groq.com/keys](https://console.groq.com/keys)
-    *   Get Google Gemini API key: [https://makers.generativeai.google/app/apikey](https://makers.generativeai.google/app/apikey)
-
-3.  **Run the Application**
-    Start the Streamlit UI for an interactive experience:
+3.  **Configure API Keys:**
+    Edit `config/config.yaml` to add your LLM API keys (e.g., OpenAI, Groq, Claude) and any other necessary configurations.
+4.  **Launch the Streamlit UI:**
+    This opens the interactive dashboard for document ingestion, analysis, comparison, and AI-powered chat in your browser.
     ```bash
     streamlit run streamlit_ui.py
     ```
-    Alternatively, launch the FastAPI backend service:
+5.  **Alternatively, run with Docker:**
+    For containerized deployment, build and run the Docker image:
     ```bash
-    uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+    docker build -t document-portal .
+    docker run -p 8501:8501 document-portal
     ```
-    This will make the application accessible, allowing you to integrate LLMs and manage documents.
+    Access the Document_Portal dashboard at `http://localhost:8501`.
 
 ## 📁 Project Structure
 
